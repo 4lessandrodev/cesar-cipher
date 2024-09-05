@@ -64,7 +64,7 @@ yarn add cesar-cipher
 
 ```
 
-#### Using
+#### Usando a lib
 
 ```typescript
 
