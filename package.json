@@ -1,0 +1,39 @@
+{
+  "name": "cesar-cipher",
+  "version": "0.0.1",
+  "description": "A simple TypeScript library for Caesar cipher encryption and decryption",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/cesar-cipher.git"
+  },
+  "keywords": [
+    "caesar",
+    "cipher",
+    "cryptography",
+    "typescript",
+    "encryption",
+    "decryption"
+  ],
+  "author": "4lessandroDev <alessandroadm@live.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "homepage": "https://github.com/seu-usuario/cesar-cipher#readme",
+  "bugs": {
+    "url": "https://github.com/seu-usuario/cesar-cipher/issues"
+  }
+}
