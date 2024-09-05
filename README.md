@@ -68,18 +68,22 @@ yarn add cesar-cipher
 
 ```typescript
 
-import { cipher } from 'cesar-cipher';
+import { crypt } from 'cesar-cipher';
+
 
 // Criar um objeto de criptografia com um shift de 25
 const cipher = crypt(25); // 1 a 25
+
 
 // Criptografar uma mensagem
 const encryptedMessage = cipher.encrypt("MENSAGEM SECRETA");
 console.log(encryptedMessage); // "LDMRZFDL RDBQDSZ"
 
+
 // Descriptografar a mensagem criptografada
 const decryptedMessage = cipher.decrypt(encryptedMessage);
 console.log(decryptedMessage); // "MENSAGEM SECRETA"
+
 
 ```
 
