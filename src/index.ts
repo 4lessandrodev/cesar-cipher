@@ -1,4 +1,4 @@
-const defaultAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const defaultAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ÇÃÉÀÊÓÁÔÍ'.split('');
 
 /**
  * Verifica se o caractere fornecido é um espaço em branco.
@@ -8,6 +8,16 @@ const defaultAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
  */
 function isWhitespace(char: string): boolean {
     return char === ' ';
+}
+
+/**
+ * Verifica se o caractere fornecido é um espaço em encriptado.
+ *
+ * @param char - O caractere a ser verificado.
+ * @returns `true` se o caractere for um espaço em encriptado, caso contrário, `false`.
+ */
+function isEncryptedWhitespace(char: string): boolean {
+    return char === '+';
 }
 
 /**
@@ -45,6 +55,31 @@ function validateShift(shift: number, alphabet: string[]): void {
 }
 
 /**
+ * Encontra um novo caractere em uma cadeia, com base em um deslocamento (shift).
+ * A função localiza o índice atual do caractere dado na cadeia e calcula um novo índice 
+ * deslocado pelo valor especificado. O novo caractere no índice deslocado é retornado.
+ * 
+ * @param char - O caractere atual que precisa ser deslocado.
+ * @param chain - Um array de caracteres representando a cadeia na qual o caractere será encontrado.
+ * @param shift - O número de posições a serem deslocadas (positivo para direita, negativo para esquerda).
+ * 
+ * @returns O novo caractere após o deslocamento na cadeia.
+ * 
+ * @example
+ * ```
+ * const alphabet = ['a', 'b', 'c', 'd', 'e'];
+ * const result = findNewChar('b', alphabet, 2); // Retorna 'd'
+ * ```
+ */
+function findNewChar(char: string, chain: string[], shift: number): string {
+    const totalNumbers = chain.length;
+    const currentIndex = chain.indexOf(char);
+    const shiftedIndex = (currentIndex + shift) % totalNumbers;
+    const newChar = chain[shiftedIndex];
+    return newChar;
+}
+
+/**
  * Aplica o deslocamento (`shift`) às letras de uma mensagem de acordo com o alfabeto fornecido.
  * 
  * @param message - A mensagem que será processada.
@@ -57,17 +92,18 @@ function shiftMessage(message: string, shift: number, alphabet: string[]): strin
     validateShift(shift, alphabet);
     return message.split("").reduce((acc, char): string => {
         if (isWhitespace(char)) {
-            return appendToMessage(char, acc);
+            return appendToMessage('+', acc);
+        }
+
+        if (isEncryptedWhitespace(char)) {
+            return appendToMessage(' ', acc);
         }
 
         if (!isInAlphabet(char, alphabet)) {
             return appendToMessage('?', acc);
         }
 
-        const totalLetters = alphabet.length;
-        const currentIndex = alphabet.indexOf(char);
-        const shiftedIndex = (currentIndex + shift) % totalLetters;
-        const newChar = alphabet[shiftedIndex];
+        const newChar = findNewChar(char, alphabet, shift);
 
         return appendToMessage(newChar, acc);
     }, "");
@@ -91,7 +127,7 @@ export function crypt(shift: number, alphabet: string[] = defaultAlphabet) {
          * @param message - A mensagem criptografada que será descriptografada.
          * @returns A mensagem original após descriptografar.
          */
-        decrypt: (message: string): string => shiftMessage(message, alphabet.length - shift, alphabet),
+        decrypt: (message: string): string => shiftMessage((message?.toString() ?? '').toUpperCase(), alphabet.length - shift, alphabet),
 
         /**
          * Criptografa uma mensagem aplicando o deslocamento.
@@ -99,7 +135,7 @@ export function crypt(shift: number, alphabet: string[] = defaultAlphabet) {
          * @param message - A mensagem original que será criptografada.
          * @returns A mensagem criptografada após aplicar o deslocamento.
          */
-        encrypt: (message: string): string => shiftMessage(message, shift, alphabet),
+        encrypt: (message: string): string => shiftMessage((message?.toString() ?? '').toUpperCase(), shift, alphabet),
     };
 }
 
