@@ -1,4 +1,4 @@
-const defaultAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ÇÃÉÀÊÓÁÔÍ'.split('');
+const defaultAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÇÃÉÀÊÓÁÔÍ0123456789abcdefghijklmnopqrstuvwxyzçãéàêóáôí'.split('');
 
 /**
  * Verifica se o caractere fornecido é um espaço em branco.
@@ -50,8 +50,8 @@ function isInAlphabet(char: string, alphabet: string[]): boolean {
  * @throws Erro se o `shift` for negativo ou maior ou igual ao tamanho do alfabeto.
  */
 function validateShift(shift: number, alphabet: string[]): void {
-    if (shift < 0) throw new Error('Shift must be positive');
-    if (shift >= alphabet.length) throw new Error('Shift must be less than the total number of alphabet letters');
+    if (shift <= 0) throw new Error('Shift must be positive');
+    if (shift >= alphabet.length) throw new Error('Shift must be less than total of alphabet letters');
 }
 
 /**
@@ -110,6 +110,57 @@ function shiftMessage(message: string, shift: number, alphabet: string[]): strin
 }
 
 /**
+ * Converte uma string de texto em uma string codificada em Base64.
+ * 
+ * @param message - A string de texto a ser convertida para Base64.
+ * @returns Uma string codificada em Base64.
+ * 
+ * @example
+ * ```
+ * const result = toBase64("Hello, World!"); // Retorna "SGVsbG8sIFdvcmxkIQ=="
+ * ```
+ */
+function toBase64(message: string): string {
+    return btoa(message);
+}
+
+/**
+ * Converte uma string codificada em Base64 de volta para uma string de texto.
+ * 
+ * @param base64 - A string Base64 a ser decodificada.
+ * @returns A string de texto original.
+ * 
+ * @example
+ * ```
+ * const result = toText("SGVsbG8sIFdvcmxkIQ=="); // Retorna "Hello, World!"
+ * ```
+ */
+function toText(base64: string): string {
+    return atob(base64);
+}
+
+/**
+ * Garante que uma mensagem seja convertida para string e retorne em letras maiúsculas.
+ * 
+ * @param message - A string de texto que será verificada e convertida.
+ * @returns A string convertida em letras maiúsculas, ou uma string vazia se a mensagem for nula ou indefinida.
+ * 
+ * @example
+ * ```
+ * const result = ensureMessage("hello"); // Retorna "HELLO"
+ * ```
+ */
+function ensureMessage(message: string): string {
+    return (message?.toString() ?? '');
+}
+
+function validateInstance(alphabet: string[], shift: number) {
+    if (typeof shift !== 'number') throw new Error('Shift must be a number');
+    if (!Array.isArray(alphabet)) throw new Error('Alphabet must be array of letters');
+    if (alphabet.length < 10) throw new Error('Alphabet must contain at least 10 letters');
+}
+
+/**
  * Cria um objeto com funções para criptografar e descriptografar mensagens.
  * 
  * @param shift - O valor de deslocamento a ser aplicado na criptografia e descriptografia.
@@ -118,24 +169,32 @@ function shiftMessage(message: string, shift: number, alphabet: string[]): strin
  * @throws Erro se o alfabeto estiver vazio ou o `shift` for inválido.
  */
 export function crypt(shift: number, alphabet: string[] = defaultAlphabet) {
-    if (alphabet.length === 0) throw new Error('Alphabet must contain at least one letter');
-
+    validateInstance(alphabet, shift);
     return {
         /**
          * Descriptografa uma mensagem aplicando o deslocamento inverso.
          * 
-         * @param message - A mensagem criptografada que será descriptografada.
+         * @param message - A mensagem criptografada que será descriptografada em base64.
          * @returns A mensagem original após descriptografar.
          */
-        decrypt: (message: string): string => shiftMessage((message?.toString() ?? '').toUpperCase(), alphabet.length - shift, alphabet),
+        decrypt: (message: string): string => {
+            const shiftIndex = alphabet.length - shift;
+            const text = toText(message);
+            const messageOrEmpty = ensureMessage(text);
+            return shiftMessage(messageOrEmpty, shiftIndex, alphabet);
+        },
 
         /**
          * Criptografa uma mensagem aplicando o deslocamento.
          * 
          * @param message - A mensagem original que será criptografada.
-         * @returns A mensagem criptografada após aplicar o deslocamento.
+         * @returns A mensagem criptografada após aplicar o deslocamento e em base64.
          */
-        encrypt: (message: string): string => shiftMessage((message?.toString() ?? '').toUpperCase(), shift, alphabet),
+        encrypt: (message: string): string => {
+            const messageOrEmpty = ensureMessage(message);
+            const text = shiftMessage(messageOrEmpty, shift, alphabet);
+            return toBase64(text);
+        },
     };
 }
 

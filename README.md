@@ -1,7 +1,5 @@
 # Criptografia de Substituição com Shift
 
-> Apenas para fins didáticos. Não é aconselhável o uso dessa biblioteca em ambiente produtivo!
-
 Este projeto implementa um simples sistema de criptografia e descriptografia de mensagens usando o conceito de **substituição por shift** (ou cifra de César). O código permite ao usuário criptografar e descriptografar mensagens, aplicando um deslocamento (`shift`) nas letras do alfabeto.
 
 ---
@@ -16,11 +14,11 @@ Por exemplo, ao criptografar a letra `A` com um `shift` de 3, a letra resultante
 
 - Mensagem original: `MENSAGEM SECRETA`
 - Shift: `3`
-- Mensagem criptografada: `PHQVDJHP+VHFUHWD`
+- Mensagem criptografada: `UEhRVkRKSFArVkhGVUhXRA==`
 
 ### Exemplo de Descriptografia
 
-- Mensagem criptografada: `PHQVDJHP+VHFUHWD`
+- Mensagem criptografada: `UEhRVkRKSFArVkhGVUhXRA==`
 - Shift: `3`
 - Mensagem descriptografada: `MENSAGEM SECRETA`
 
@@ -45,13 +43,13 @@ yarn add cesar-cipher
 import { crypt } from 'cesar-cipher';
 
 
-// Criar um objeto de criptografia com um shift de 25
+// Criar um objeto de criptografia com um shift de 3
 const cipher = crypt(3); // 1 a 25
 
 
 // Criptografar uma mensagem
 const encryptedMessage = cipher.encrypt("OLA MUNDO");
-console.log(encryptedMessage); // "ROD+PXQGR"
+console.log(encryptedMessage); // "Uk9EK1BYUUdS"
 
 
 // Descriptografar a mensagem criptografada
