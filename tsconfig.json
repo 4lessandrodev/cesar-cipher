@@ -11,8 +11,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "strictNullChecks": true,
-    "removeComments": true
+    "strictNullChecks": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

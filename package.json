@@ -1,6 +1,6 @@
 {
   "name": "cesar-cipher",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple TypeScript library for Caesar cipher encryption and decryption",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
