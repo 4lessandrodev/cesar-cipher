@@ -154,10 +154,119 @@ function ensureMessage(message: string): string {
     return (message?.toString() ?? '');
 }
 
+/**
+ * Valida os parâmetros fornecidos para garantir que atendem aos critérios esperados.
+ * 
+ * Esta função verifica se o parâmetro `shift` é um número e se o parâmetro `alphabet` é um array contendo pelo menos 10 letras.
+ * Se algum dos parâmetros não atender aos critérios, uma exceção é lançada com uma mensagem de erro apropriada.
+ * 
+ * @param alphabet - Um array de strings representando o alfabeto, que deve conter pelo menos 10 letras.
+ * @param shift - Um número que representa o valor de deslocamento. Deve ser do tipo `number`.
+ * 
+ * @throws {Error} Se o parâmetro `shift` não for um número.
+ * @throws {Error} Se o parâmetro `alphabet` não for um array.
+ * @throws {Error} Se o array `alphabet` contiver menos de 10 letras.
+ * 
+ * @example
+ * ```typescript
+ * try {
+ *     validateInstance(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'], 5);
+ *     // Não lança exceção
+ * 
+ *     validateInstance(['a', 'b', 'c'], 5);
+ *     // Lança Error: Alphabet must contain at least 10 letters
+ * 
+ *     validateInstance('invalidAlphabet', 5);
+ *     // Lança Error: Alphabet must be array of letters
+ * 
+ *     validateInstance(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'], 'invalidShift');
+ *     // Lança Error: Shift must be a number
+ * ``` 
+ */
 function validateInstance(alphabet: string[], shift: number) {
     if (typeof shift !== 'number') throw new Error('Shift must be a number');
     if (!Array.isArray(alphabet)) throw new Error('Alphabet must be array of letters');
     if (alphabet.length < 10) throw new Error('Alphabet must contain at least 10 letters');
+}
+
+/**
+ * Remove caracteres duplicados de uma string e retorna uma nova string com caracteres únicos, preservando a ordem original.
+ * 
+ * A função verifica cada caractere da string `secret` e constrói uma nova string contendo apenas a primeira ocorrência de cada caractere. 
+ * Caso a string `secret` seja indefinida (`undefined`), a função trata isso como uma string vazia.
+ * 
+ * @param secret - Uma string opcional da qual os caracteres duplicados serão removidos. Se não for fornecida, será tratada como uma string vazia.
+ * 
+ * @returns Uma nova string contendo apenas caracteres únicos da string `secret`, preservando a ordem em que eles aparecem pela primeira vez.
+ * 
+ * @example
+ * ```typescript
+ * const result = toUniqueChars('aabbcc');
+ * console.log(result); // Output: 'abc'
+ * 
+ * const resultEmpty = toUniqueChars();
+ * console.log(resultEmpty); // Output: ''
+ * ```
+ */
+function toUniqueChars(secret: string): string {
+    return (secret).split('').reduce((prev, current): string => {
+        if (prev.includes(current)) return prev;
+        if (isWhitespace(current)) return prev;
+        return prev + current;
+    }, '');
+}
+
+/**
+ * Verifica se um caractere está presente no alfabeto padrão.
+ * 
+ * A função verifica se o caractere fornecido está incluído no alfabeto padrão definido pela variável `defaultAlphabet`.
+ * 
+ * @param char - O caractere a ser verificado. Deve ser uma string de um único caractere.
+ * 
+ * @returns `true` se o caractere estiver presente no alfabeto padrão, caso contrário, `false`.
+ * 
+ * @throws {Error} Se `char` não for uma string de comprimento 1.
+ * 
+ * @example
+ * ```typescript
+ * const result1 = isOnAlphabet('a');
+ * console.log(result1); // Output: true (se 'a' estiver no `defaultAlphabet`)
+ * 
+ * const result2 = isOnAlphabet('z');
+ * console.log(result2); // Output: false (se 'z' não estiver no `defaultAlphabet`)
+ * ```
+ */
+function isOnAlphabet(char: string): boolean {
+    return defaultAlphabet.includes(char);
+}
+
+/**
+ * Substitui caracteres ausentes em uma sequência de caracteres com base em um alfabeto fornecido.
+ * 
+ * A função verifica cada caractere do alfabeto para ver se ele está presente na string `secret`. 
+ * Se um caractere do alfabeto não estiver presente na string `secret`, ele é adicionado ao final da string resultante.
+ * 
+ * @param alphabet - Um array de strings representando o alfabeto ou conjunto de caracteres a ser verificado e adicionado.
+ * @param secret - Uma string contendo os caracteres iniciais que serão verificados e atualizados com base no alfabeto.
+ * 
+ * @returns Um array de strings representando a sequência resultante após a adição dos caracteres do alfabeto que estavam ausentes na string `secret`.
+ * 
+ * @example
+ * ```typescript
+ * const alphabet = ['a', 'b', 'c', 'd', 'e'];
+ * const secret = 'ac';
+ * const result = replace(alphabet, secret);
+ * console.log(result); // Output: ['a', 'c', 'b', 'd', 'e']
+ * ```
+ */
+function replace(alphabet: string[], secret: string): string[] {
+    const result: string[] = [...secret];
+    if (!result.length) return alphabet;
+    for (const char of alphabet) {
+        if (result.includes(char) || !isOnAlphabet(char)) continue;
+        result.push(char);
+    }
+    return result;
 }
 
 /**
@@ -166,7 +275,7 @@ function validateInstance(alphabet: string[], shift: number) {
  * @param shift - O valor de deslocamento a ser aplicado na criptografia e descriptografia.
  * @param alphabet - O array que representa o alfabeto (opcional). Se não fornecido, usa o alfabeto padrão.
  * @returns Um objeto com os métodos `encrypt` e `decrypt` para processar mensagens.
- * @throws Erro se o alfabeto estiver vazio ou o `shift` for inválido.
+ * @throws Erro se o alfabeto for informado e estiver vazio ou o `shift` for inválido.
  */
 export function crypt(shift: number, alphabet: string[] = defaultAlphabet) {
     validateInstance(alphabet, shift);
@@ -175,24 +284,30 @@ export function crypt(shift: number, alphabet: string[] = defaultAlphabet) {
          * Descriptografa uma mensagem aplicando o deslocamento inverso.
          * 
          * @param message - A mensagem criptografada que será descriptografada em base64.
+         * @param secret - O segredo que foi utilizado para a criptografia.
          * @returns A mensagem original após descriptografar.
          */
-        decrypt: (message: string): string => {
-            const shiftIndex = alphabet.length - shift;
-            const text = toText(message);
-            const messageOrEmpty = ensureMessage(text);
-            return shiftMessage(messageOrEmpty, shiftIndex, alphabet);
+        decrypt: (message: string, secret: string = ''): string => {
+            const messageOrEmpty = ensureMessage(message);
+            const replacer = toUniqueChars(secret);
+            const replacedAlphabet = replace(alphabet, replacer);
+            const shiftIndex = replacedAlphabet.length - shift;
+            const text = toText(messageOrEmpty);
+            return shiftMessage(text, shiftIndex, replacedAlphabet);
         },
 
         /**
          * Criptografa uma mensagem aplicando o deslocamento.
          * 
          * @param message - A mensagem original que será criptografada.
+         * @param secret - O segredo que deseja utilizar para a criptografia.
          * @returns A mensagem criptografada após aplicar o deslocamento e em base64.
          */
-        encrypt: (message: string): string => {
+        encrypt: (message: string, secret: string = ''): string => {
             const messageOrEmpty = ensureMessage(message);
-            const text = shiftMessage(messageOrEmpty, shift, alphabet);
+            const replacer = toUniqueChars(secret);
+            const replacedAlphabet = replace(alphabet, replacer);
+            const text = shiftMessage(messageOrEmpty, shift, replacedAlphabet);
             return toBase64(text);
         },
     };

@@ -29,3 +29,23 @@ test("cesar-cipher: criptografar e descriptografar", () => {
     const decryptedMessage4 = cesar.decrypt(encryptedMessage4);
     assert.strictEqual(decryptedMessage4, 'Hacker White Hat', 'A mensagem 4 descriptografada está incorreta');
 });
+
+test("cesar-cipher: criptografar e descriptografar com segredo", () => {
+    const cesar = crypt(3);
+
+    const encryptedMessage1 = cesar.encrypt('OLA MUNDO', 'segredo forte');
+    assert.strictEqual(encryptedMessage1, 'Uk9EK1BYUUdS', 'A mensagem 1 criptografada está incorreta');
+
+    const decryptedMessage1 = cesar.decrypt(encryptedMessage1, 'segredo forte');
+    assert.strictEqual(decryptedMessage1, 'OLA MUNDO', 'A mensagem 1 descriptografada está incorreta');
+
+    const encryptedMessage2 = cesar.encrypt('olá mundo', 's3gr3do f0rt3');
+    assert.strictEqual(encryptedMessage2, 'dHBzK3F4dTB0', 'A mensagem 2 criptografada está incorreta');
+
+    const decryptedMessage2 = cesar.decrypt(encryptedMessage2, 's3gr3do f0rt3');
+    assert.strictEqual(decryptedMessage2, 'olá mundo', 'A mensagem 2 descriptografada está incorreta');
+
+    const decryptedMessage3 = cesar.decrypt(encryptedMessage2, 'invalid secret');
+    assert.strictEqual(decryptedMessage3, 'eka mqoÁe', 'A mensagem 3 descriptografada está incorreta');
+
+});
